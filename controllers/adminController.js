@@ -1,6 +1,11 @@
 const Admin = require("../models/admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const {
+  calculateDailySales,
+  calculateMonthlySales,
+} = require("../services/salesService");
+const Order = require("../models/order");
 
 const registerAdmin = async (req, res) => {
   try {
@@ -79,4 +84,56 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registerAdmin, loginAdmin };
+const getDailySales = async (res, req) => {
+  try {
+    const date = req.params.date;
+    const sales = await calculateDailySales(date);
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching daily sales", error });
+  }
+};
+
+const getMonthlySales = async (req, res) => {
+  try {
+    const { year, month } = req.params;
+    const sales = await calculateMonthlySales(month, year);
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching monthly sales", error });
+  }
+};
+
+const getOrderDetails = async (req, res) => {
+  try {
+    const orders = await Order.find({ status: "completed" }).populate(
+      "foods",
+      "name price"
+    );
+
+    if (!orders.length) {
+      return res.status(404).json({ message: "No orders found." });
+    }
+
+    const detailedOrders = orders.map((order) => ({
+      orderId: order._id,
+      foods: order.foods.map((food) => ({
+        name: food.name,
+        price: food.price,
+      })),
+      totalPrice: order.totalPrice,
+      createdAt: order.createdAt,
+    }));
+    res.status(200).json(detailedOrders);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching order details", error });
+  }
+};
+
+module.exports = {
+  registerAdmin,
+  loginAdmin,
+  getDailySales,
+  getMonthlySales,
+  getOrderDetails,
+};
