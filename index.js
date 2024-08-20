@@ -9,6 +9,8 @@ const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const chefRoutes = require("./routes/chefRoutes");
 
+require("dotenv").config();
+
 const app = express();
 
 app.use(bodyParser.json());

@@ -9,7 +9,7 @@ const Order = require("../models/order");
 
 const registerAdmin = async (req, res) => {
   try {
-    const { username, password, image, email, role } = req.body;
+    const { username, password, email } = req.body;
 
     const existingUser = await Admin.findOne({ email });
     if (existingUser) throw new Error("Admin already exists");
@@ -18,9 +18,7 @@ const registerAdmin = async (req, res) => {
     const admin = new Admin({
       username,
       password: hashedPassword,
-      image,
       email,
-      role,
       canAddCategory: true,
       canAddFood: true,
       canViewOrders: true,
@@ -28,23 +26,28 @@ const registerAdmin = async (req, res) => {
     });
     await admin.save();
 
-    // let token;
-    // try {
-    //   token = jwt.sign(
-    //     {
-    //       id: admin.id,
-    //       email: admin.email,
-    //     },
-    //     process.env.JWT_SECRET,
-    //     {
-    //       expiresIn: "1h",
-    //     }
-    //   );
-    // } catch (err) {
-    //   res.status(400).json({ error: err.message });
-    // }
+    let token;
+    try {
+      token = jwt.sign(
+        {
+          id: admin._id,
+          email: admin.email,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
 
-    res.status(201).json({ message: "Admin registered" });
+    res.status(201).json({
+      userId: admin._id,
+      email: admin.email,
+      token: token,
+      role: admin.role,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -73,12 +76,17 @@ const loginAdmin = async (req, res) => {
     if (!isValidPassword) {
     }
 
-    // const token = jwt.sign(
-    //   { id: existingUser._id, email: existingUser.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "1h" }
-    // );
-    res.json({ username: existingUser.username, role: existingUser.role });
+    const token = jwt.sign(
+      { id: existingUser._id, email: existingUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    res.json({
+      userId: existingUser._id,
+      email: existingUser.email,
+      token: token,
+      role: existingUser.role,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

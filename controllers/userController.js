@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   try {
-    const { username, password, image, email, role } = req.body;
+    const { username, password, email } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) throw new Error("User already exists");
@@ -13,31 +13,35 @@ const registerUser = async (req, res) => {
     const user = new User({
       username,
       password: hashedPassword,
-      image,
       email,
-      role,
+      role: "user",
     });
     await user.save();
 
-    // let token;
-    // try {
-    //   token = jwt.sign(
-    //     {
-    //       id: user.id,
-    //       email: user.email,
-    //     },
-    //     process.env.JWT_SECRET,
-    //     {
-    //       expiresIn: "1h",
-    //     }
-    //   );
-    // } catch (err) {
-    //   res.status(400).json({ error: err.message });
-    // }
+    let token;
+    try {
+      token = jwt.sign(
+        {
+          id: user._id,
+          email: user.email,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
 
-    res.status(201).json({ message: "User registered" });
+    res.status(201).json({
+      userId: user._id,
+      email: user.email,
+      token: token,
+      role: user.role,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message, hello: req.body.password });
   }
 };
 
@@ -64,12 +68,17 @@ const loginUser = async (req, res) => {
     if (!isValidPassword) {
     }
 
-    // const token = jwt.sign(
-    //   { id: existingUser._id, email: existingUser.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "1h" }
-    // );
-    res.json({ username: existingUser.username, role: existingUser.role });
+    const token = jwt.sign(
+      { id: existingUser._id, email: existingUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    res.json({
+      userId: existingUser._id,
+      email: existingUser.email,
+      role: existingUser.role,
+      token: token,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
