@@ -5,8 +5,10 @@ const createCategory = async (req, res) => {
     const { name } = req.body;
     const category = new Category({ name });
     await category.save();
+    res.status(201).json(category);
   } catch (error) {
     res.status(400).json({ error: error.message });
+    console.log(error);
   }
 };
 
@@ -27,7 +29,8 @@ const updateCategories = async (req, res) => {
       new: true,
     });
     if (!category) throw new Error("Category not found");
-    res.json(category);
+    const categories = await Category.find();
+    res.json(categories);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

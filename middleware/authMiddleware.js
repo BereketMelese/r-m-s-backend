@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return next();
+  }
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
@@ -9,19 +13,20 @@ const auth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const userId = decoded.id;
+
+    const user = await User.findById(userId);
+    req.user = user;
     next();
   } catch (error) {
     res.status(401).json({ message: error.message });
   }
-
-  next();
 };
 
 const rollCheck = (roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Access denied" });
+      return res.status(403).json({ message: "Access Denied" });
     }
     next();
   };

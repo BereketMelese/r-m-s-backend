@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message, hello: req.body.password });
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -79,9 +79,7 @@ const loginUser = async (req, res) => {
       role: existingUser.role,
       token: token,
     });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+  } catch (error) {}
 };
 
 module.exports = { registerUser, loginUser };

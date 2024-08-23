@@ -1,11 +1,13 @@
 const Order = require("../models/order");
 const User = require("../models/User");
 const Food = require("../models/food");
+const mongoose = require("mongoose");
 
 const creatOrder = async (req, res) => {
   try {
-    const { userName, foods, totalPrice } = req.body;
-    let user = await User.findOne({ username: userName });
+    const { userId, foods, totalPrice } = req.body;
+
+    let user = await User.findById(userId);
 
     const ValidFoods = await Promise.all(
       foods.map(async (names) => {

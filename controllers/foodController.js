@@ -4,6 +4,7 @@ const Category = require("../models/Category");
 const createFood = async (req, res) => {
   try {
     const { name, price, image, categoryName } = req.body;
+
     let category = await Category.findOne({ name: categoryName });
     const food = new Food({ name, price, image, category: category._id });
     await food.save();
@@ -25,11 +26,10 @@ const getFoods = async (req, res) => {
 const updateFood = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, image, categoryName } = req.body;
-    let category = await Category.findOne({ name: categoryName });
+    const { name, price, image } = req.body;
     const food = await Food.findByIdAndUpdate(
       id,
-      { name, price, image, category: category._id },
+      { name, price, image },
       { new: true }
     );
     if (!food) throw new Error("Food item was not found");

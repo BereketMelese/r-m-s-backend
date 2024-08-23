@@ -88,7 +88,7 @@ const loginAdmin = async (req, res) => {
       role: existingUser.role,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    // res.status(400).json({ error: error.message });
   }
 };
 
