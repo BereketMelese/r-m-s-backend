@@ -32,6 +32,7 @@ const creatOrder = async (req, res) => {
       user: user._id,
       foods: validFoodIds,
       totalPrice,
+      status: "pending",
       table: table._id,
     });
 
@@ -58,7 +59,10 @@ const updateOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("user").populate("foods");
+    const orders = await Order.find()
+      .populate("user")
+      .populate("foods")
+      .populate("table");
     res.json(orders);
   } catch (error) {
     res.status(400).json({ error: error.message });
