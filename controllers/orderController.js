@@ -1,13 +1,23 @@
 const Order = require("../models/order");
 const User = require("../models/User");
 const Food = require("../models/food");
+const Table = require("../models/table");
 const mongoose = require("mongoose");
 
 const creatOrder = async (req, res) => {
   try {
     const { userId, foods, totalPrice } = req.body;
+    const tableId = req.query.tableId;
 
     let user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const table = await Table.findOne({ tableId });
+    if (!table) {
+      return res.status(400).json({ message: "Invalid table ID" });
+    }
 
     const ValidFoods = await Promise.all(
       foods.map(async (names) => {
@@ -22,6 +32,7 @@ const creatOrder = async (req, res) => {
       user: user._id,
       foods: validFoodIds,
       totalPrice,
+      table: table._id,
     });
 
     await order.save();

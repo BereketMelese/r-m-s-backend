@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema({
   totalPrice: { type: Number, required: true },
   status: { type: String, eNum: ["pending", "in_progress", "completed"] },
   createdAt: { type: Date, default: Date.now },
+  table: { type: mongoose.Schema.Types.ObjectId, ref: "Table", required: true },
 });
 
 module.exports = mongoose.model("order", orderSchema);
