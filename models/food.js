@@ -9,6 +9,7 @@ const foodSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  points: { type: Number },
 });
 
 module.exports = mongoose.model("Food", foodSchema);

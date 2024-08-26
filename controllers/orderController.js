@@ -1,8 +1,9 @@
 const Order = require("../models/order");
-const User = require("../models/User");
+const User = require("../models/user");
 const Food = require("../models/food");
 const Table = require("../models/table");
 const mongoose = require("mongoose");
+const food = require("../models/food");
 
 const creatOrder = async (req, res) => {
   try {
@@ -49,6 +50,32 @@ const updateOrder = async (req, res) => {
     const { orderId, status } = req.body;
     const order = await Order.findById(orderId);
     if (!order) throw new Error("Order not found");
+
+    if (status === "completed" && order.status !== "completed") {
+      const user = await User.findById(order.user);
+
+      if (user) {
+        let totalPoints = 0;
+
+        const foodPromises = order.foods.map(async (foodId) => {
+          const food = await Food.findById(foodId);
+          return food.points;
+        });
+
+        const pointsArray = await Promise.all(foodPromises);
+
+        for (let i = 0; i < pointsArray.length; i++) {
+          if (!isNaN(pointsArray[i])) {
+            totalPoints += pointsArray[i];
+          }
+        }
+
+        console.log(totalPoints);
+        user.points += totalPoints;
+        await user.save();
+      }
+    }
+
     order.status = status;
     await order.save();
     res.json(order);

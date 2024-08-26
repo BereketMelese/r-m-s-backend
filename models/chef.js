@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const User = require("./User");
+const User = require("./user");
 
 const chefSchema = new mongoose.Schema({
   canManageOrders: { type: Boolean, default: true },

@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -15,6 +15,7 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
       email,
       role: "user",
+      points: 15,
     });
     await user.save();
 
@@ -39,6 +40,7 @@ const registerUser = async (req, res) => {
       email: user.email,
       token: token,
       role: user.role,
+      points: user.points,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -82,4 +84,15 @@ const loginUser = async (req, res) => {
   } catch (error) {}
 };
 
-module.exports = { registerUser, loginUser };
+const getUsers = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const users = await User.findById(id);
+
+    res.json(users);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUsers };

@@ -3,10 +3,16 @@ const Category = require("../models/Category");
 
 const createFood = async (req, res) => {
   try {
-    const { name, price, image, categoryName } = req.body;
+    const { name, price, image, categoryName, points } = req.body;
 
     let category = await Category.findOne({ name: categoryName });
-    const food = new Food({ name, price, image, category: category._id });
+    const food = new Food({
+      name,
+      price,
+      image,
+      category: category._id,
+      points,
+    });
     await food.save();
     res.status(201).json(food);
   } catch (error) {
