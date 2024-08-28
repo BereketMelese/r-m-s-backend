@@ -10,6 +10,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const chefRoutes = require("./routes/chefRoutes");
 const tableRoutes = require("./routes/tableRoute");
+const salesService = require("./routes/salesRoutes");
 
 require("dotenv").config();
 
@@ -25,6 +26,7 @@ app.use("/api/order", orderRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/chefs", chefRoutes);
 app.use("/api/table", tableRoutes);
+app.use("/api", salesService);
 
 // app.listen(5000);
 

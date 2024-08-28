@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   role: { type: String },
   points: { type: Number },
+  rating: { type: Number, min: 1, max: 5 },
+  hasRated: { type: Boolean, default: false },
 });
 
 userSchema.pre("save", async function (next) {

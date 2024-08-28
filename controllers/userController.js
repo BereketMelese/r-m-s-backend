@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const user = require("../models/user");
 
 const registerUser = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
       email,
       role: "user",
-      points: 15,
+      points: 5,
     });
     await user.save();
 
@@ -95,4 +96,24 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUsers };
+const submitRating = async (req, res) => {
+  try {
+    const { userId, rating } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (user && !user.hasRated) {
+      user.hasRated = true;
+      user.rating = rating;
+
+      res.status(200).json({ message: "Rating submitted successfully" });
+    } else {
+      res.status(400).json({ message: "User has already rated" });
+    }
+    await user.save();
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUsers, submitRating };

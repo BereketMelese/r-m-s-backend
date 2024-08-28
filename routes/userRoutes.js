@@ -3,6 +3,7 @@ const {
   registerUser,
   loginUser,
   getUsers,
+  submitRating,
 } = require("../controllers/userController");
 
 const { auth } = require("../middleware/authMiddleware");
@@ -13,6 +14,7 @@ const router = express.Router();
 router.get("/:id", auth, getUsers);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/rate", submitRating);
 router.get("/food", getFoods);
 
 module.exports = router;

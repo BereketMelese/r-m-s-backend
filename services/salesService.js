@@ -7,17 +7,16 @@ const calculateDailySales = async (date) => {
 
   const sales = await Order.aggregate([
     { $match: { status: "completed", createdAt: { $gte: start, $lt: end } } },
-    { $unwind: "$items" },
     {
       $group: {
         _id: null,
-        totalRevenue: { $sum: "$items.price" },
-        totalItemsSold: { $sum: "$items.quantity" },
+        totalRevenue: { $sum: "$totalPrice" },
+        totalOrders: { $sum: 1 },
       },
     },
   ]);
 
-  return sales[0] || { totalRevenue: 0, totalItemsSold: 0 };
+  return sales[0] || { totalRevenue: 0, totalOrders: 0 };
 };
 
 const calculateMonthlySales = async (month, year) => {
@@ -26,17 +25,16 @@ const calculateMonthlySales = async (month, year) => {
 
   const sales = await Order.aggregate([
     { $match: { status: "completed", createdAt: { $gte: start, $lt: end } } },
-    { $unwind: "$items" },
     {
       $group: {
         _id: null,
-        totalRevenue: { $sum: "$items.price" },
-        totalItemsSold: { $sum: "$items.quantity" },
+        totalRevenue: { $sum: "$totalPrice" },
+        totalOrders: { $sum: 1 },
       },
     },
   ]);
 
-  return sales[0] || { totalRevenue: 0, totalItemsSold: 0 };
+  return sales[0] || { totalRevenue: 0, totalOrders: 0 };
 };
 
 module.exports = {

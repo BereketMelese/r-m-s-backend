@@ -7,7 +7,7 @@ const food = require("../models/food");
 
 const creatOrder = async (req, res) => {
   try {
-    const { userId, foods, totalPrice } = req.body;
+    const { userId, foods, totalPrice, usePoints } = req.body;
     const tableId = req.query.tableId;
 
     let user = await User.findById(userId);
@@ -28,6 +28,17 @@ const creatOrder = async (req, res) => {
     );
 
     const validFoodIds = ValidFoods.filter((id) => id !== null);
+
+    let orderRequiredPoints = totalPrice;
+    if (usePoints) {
+      const requiredPoints = orderRequiredPoints * 6;
+      if (user.points < requiredPoints) {
+        return res.status(400).json({ message: "Not enough points" });
+      }
+      user.points -= requiredPoints;
+      await user.save();
+      orderRequiredPoints = 0;
+    }
 
     const order = new Order({
       user: user._id,
@@ -70,14 +81,19 @@ const updateOrder = async (req, res) => {
           }
         }
 
-        console.log(totalPoints);
         user.points += totalPoints;
+        order.status = status;
+        await order.save();
         await user.save();
+
+        res.json(order);
+        return;
       }
     }
 
     order.status = status;
     await order.save();
+
     res.json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
