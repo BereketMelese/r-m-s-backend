@@ -2,8 +2,8 @@ const Order = require("../models/order");
 const User = require("../models/user");
 const Food = require("../models/food");
 const Table = require("../models/table");
+const Settings = require("../models/setting");
 const mongoose = require("mongoose");
-const food = require("../models/food");
 
 const creatOrder = async (req, res) => {
   try {
@@ -20,6 +20,8 @@ const creatOrder = async (req, res) => {
       return res.status(400).json({ message: "Invalid table ID" });
     }
 
+    const settings = await Settings.findOne();
+
     const ValidFoods = await Promise.all(
       foods.map(async (names) => {
         const food = await Food.findOne({ name: names });
@@ -30,8 +32,8 @@ const creatOrder = async (req, res) => {
     const validFoodIds = ValidFoods.filter((id) => id !== null);
 
     let orderRequiredPoints = totalPrice;
-    if (usePoints) {
-      const requiredPoints = orderRequiredPoints * 6;
+    if (usePoints && settings.paywithPointsEnabled) {
+      const requiredPoints = orderRequiredPoints * settings.pointMultiplier;
       if (user.points < requiredPoints) {
         return res.status(400).json({ message: "Not enough points" });
       }
