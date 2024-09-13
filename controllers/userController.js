@@ -53,13 +53,11 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     let existingUser;
+
     try {
       existingUser = await User.findOne({ email: email });
     } catch (err) {
       res.status(400).json({ error: err.message });
-    }
-
-    if (!existingUser) {
     }
 
     let isValidPassword = false;
@@ -67,8 +65,6 @@ const loginUser = async (req, res) => {
       isValidPassword = await bcrypt.compare(password, existingUser.password);
     } catch (err) {
       res.status(400).json({ error: err.message });
-    }
-    if (!isValidPassword) {
     }
 
     const token = jwt.sign(
@@ -82,7 +78,9 @@ const loginUser = async (req, res) => {
       role: existingUser.role,
       token: token,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const getUsers = async (req, res) => {

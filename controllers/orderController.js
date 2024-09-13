@@ -23,13 +23,13 @@ const creatOrder = async (req, res) => {
     const settings = await Settings.findOne();
 
     const ValidFoods = await Promise.all(
-      foods.map(async (names) => {
-        const food = await Food.findOne({ name: names });
-        return food ? food._id : false;
+      foods.map(async (item) => {
+        const food = await Food.findOne({ name: item.name });
+        return food ? { foodId: food._id, quantity: item.quantity } : false;
       })
     );
 
-    const validFoodIds = ValidFoods.filter((id) => id !== null);
+    const validFoodItems = ValidFoods.filter((item) => item !== null);
 
     let orderRequiredPoints = totalPrice;
     if (usePoints && settings.paywithPointsEnabled) {
@@ -44,7 +44,7 @@ const creatOrder = async (req, res) => {
 
     const order = new Order({
       user: user._id,
-      foods: validFoodIds,
+      foods: validFoodItems,
       totalPrice,
       status: "pending",
       table: table._id,
@@ -61,7 +61,7 @@ const creatOrder = async (req, res) => {
 const updateOrder = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("foods.foodId");
     if (!order) throw new Error("Order not found");
 
     if (status === "completed" && order.status !== "completed") {
@@ -70,16 +70,11 @@ const updateOrder = async (req, res) => {
       if (user) {
         let totalPoints = 0;
 
-        const foodPromises = order.foods.map(async (foodId) => {
-          const food = await Food.findById(foodId);
-          return food.points;
-        });
-
-        const pointsArray = await Promise.all(foodPromises);
-
-        for (let i = 0; i < pointsArray.length; i++) {
-          if (!isNaN(pointsArray[i])) {
-            totalPoints += pointsArray[i];
+        for (const foodItem of order.foods) {
+          const food = foodItem.foodId;
+          if (food) {
+            const pointsForThisFood = food.points * foodItem.quantity;
+            totalPoints += pointsForThisFood;
           }
         }
 
@@ -106,7 +101,10 @@ const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("user")
-      .populate("foods")
+      .populate({
+        path: "foods.foodId",
+        model: "Food",
+      })
       .populate("table");
     res.json(orders);
   } catch (error) {
