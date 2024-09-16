@@ -112,4 +112,8 @@ const getOrders = async (req, res) => {
   }
 };
 
-module.exports = { creatOrder, updateOrder, getOrders };
+module.exports = {
+  creatOrder,
+  updateOrder,
+  getOrders,
+};

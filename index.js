@@ -12,6 +12,7 @@ const chefRoutes = require("./routes/chefRoutes");
 const tableRoutes = require("./routes/tableRoute");
 const salesService = require("./routes/salesRoutes");
 const settingsRoutes = require("./routes/settingRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 require("dotenv").config();
 
@@ -29,6 +30,7 @@ app.use("/api/chefs", chefRoutes);
 app.use("/api/table", tableRoutes);
 app.use("/api/points", settingsRoutes);
 app.use("/api", salesService);
+app.use("/api/dashboard", dashboardRoutes);
 
 // app.listen(5000);
 

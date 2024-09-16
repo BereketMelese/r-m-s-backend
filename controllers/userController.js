@@ -87,7 +87,6 @@ const getUsers = async (req, res) => {
   try {
     const { id } = req.params;
     const users = await User.findById(id);
-
     res.json(users);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -114,4 +113,9 @@ const submitRating = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUsers, submitRating };
+module.exports = {
+  registerUser,
+  loginUser,
+  getUsers,
+  submitRating,
+};

@@ -56,4 +56,9 @@ const deleteFood = async (req, res) => {
   }
 };
 
-module.exports = { createFood, getFoods, updateFood, deleteFood };
+module.exports = {
+  createFood,
+  getFoods,
+  updateFood,
+  deleteFood,
+};
