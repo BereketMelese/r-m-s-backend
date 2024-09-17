@@ -24,7 +24,6 @@ const getDashboardData = async (req, res) => {
       totalUsers,
       totalRevenue,
     });
-    console.log(res);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

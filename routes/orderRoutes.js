@@ -9,8 +9,8 @@ const { auth, rollCheck } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", getOrders); //router.get("/", auth, rollCheck(["admin", "chef"]), getOrders);
-router.post("/", creatOrder); //router.post("/", auth, rollCheck(["user"]), creatOrder);
-router.patch("/status", updateOrder); //router.patch("/status", auth, rollCheck(["admin", "chef"]), updateOrder);
+router.get("/", getOrders);
+router.post("/", creatOrder);
+router.patch("/status", updateOrder);
 
 module.exports = router;
